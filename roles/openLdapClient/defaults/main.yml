@@ -14,5 +14,3 @@ ldapCaCertFileSource: "/etc/openldap/certs"
 cacertFile: "ca.pem"
 ldapRfc2307: ""
 ldapRfc2307Pam: ""
-
-

@@ -10,7 +10,7 @@
   run_once: true
   args:
     creates: "{{ importRepo.destination }}"
-  when: ansible_distribution == 'CentOS' and importRepo is defined
+  when: importRepo is defined
 
 - name: Install yum packages 
   yum: name={{ item }} state=latest
@@ -27,14 +27,17 @@
 - name: Post installation
   shell: "{{ postInstallation }}" 
   sudo: true
-  when: ansible_distribution == 'CentOS' and postInstallation is defined
+  when: postInstallation is defined
  
-- name: conditional shell copy command 
+- name: Conditional shell copy command 
   shell: "{{ cliCopy.run }}"
   sudo: true
   run_once: true
   args:
     creates: "{{ cliCopy.check }}"
-  when: ansible_distribution == 'CentOS' and cliAction is defined
+  when: cliAction is defined
 
-
+- name: Copy file
+  copy: "src={{ cliFileCopy.src }} dest={{ cliFileCopy.dest }}"
+  sudo: true
+  when: cliFileCopy is defined

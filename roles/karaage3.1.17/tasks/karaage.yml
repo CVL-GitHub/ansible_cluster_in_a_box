@@ -99,17 +99,6 @@
  file: path=/var/www state=directory owner=root group={{ apache_user }} mode=0775
  sudo: true
 -
- name: "enabling Karaage configuration"
- shell: a2enconf karaage3-wsgi
- sudo: true
- when: ansible_os_family == "Debian"
--
- name: "enabling Karaage configuration"
- shell: cp -rvpf /root/karaage3.1.7/conf/karaage3-wsgi.conf /etc/httpd/conf.d/karaage3-wsgi.conf
- sudo: true
- when: ansible_os_family == "RedHat"
-
--
  name: "Installing other packages Debian"
  apt: name={{ item }} update_cache=yes
  with_items:
@@ -157,12 +146,21 @@
 
 -
  name: "Enable wsgi config"
- file: src=/etc/apache2/mods-available/wsgi.conf path=/etc/apache2/mods-enabled/wsgi.conf state=link 
+ file: src=/etc/{{ apache_dir }}/mods-available/wsgi.conf path=/etc/{{ apache_dir }}/mods-enabled/wsgi.conf state=link 
  sudo: true
 
 -
  name: "Enable wsgi load"
- file: src=/etc/apache2/mods-available/wsgi.load path=/etc/apache2/mods-enabled/wsgi.load state=link 
+ file: src=/etc/{{ apache_dir }}/mods-available/wsgi.load path=/etc/{{ apache_dir }}/mods-enabled/wsgi.load state=link 
+ sudo: true
+-
+ name: "Copy karaage configuration file"
+ template: src=karaage3-wsgi.conf.j2 dest=/etc/{{ apache_dir }}/conf-available/karaage3-wsgi.conf
+ sudo: true
+-
+ name: "Enable karaage load"
+ file: src=/etc/{{ apache_dir }}/conf-available/karaage3-wsgi.conf path=/etc/{{ apache_dir }}/conf-enabled/karaage3-wsgi.conf state=link 
+ notify: restart apache
  sudo: true
 
 - name: enable shibboleth
@@ -184,33 +182,12 @@
   sudo: true
   notify: restart postfix
 
-
 -
- name: "Restarting Celery"
- service: name=karaage3-celery state=restarted
+ name: "Starting Celery"
+ service: name=karaage3-celery state=started
  sudo: true
  when: ansible_os_family == "Debian"
 -
- name: "Reloading apache"
- service: name=apache2 state=reloaded
+ name: "Start apache"
+ service: name={{ apache_service }} state=started
  sudo: true
- when: ansible_os_family == "Debian"
-
--
- name: "Reloading apache"
- service: name=httpd state=reloaded
- sudo: true
- when: ansible_os_family == "RedHat"
-
-- 
- name: "Enable shibboleth (ansible-galaxy install yaegashi.blockinfile)"
- blockinfile:
-   dest: /etc/apache2/conf-available/karaage3-wsgi.conf
-   block: |
-     <Location /karaage>
-     AuthType Shibboleth
-     ShibRequireSession On
-     ShibUseHeaders On
-     require valid-user
-     </Location>
-

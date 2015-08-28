@@ -1,8 +1,18 @@
 ---
-- name: restart apache2 
-  service: name=apache2 state=restarted
+- name: restart apache 
+  service: name={{ apache_service }} state=restarted
   sudo: true
+
+- name: reload apache  
+  service: name={{ apache_service }} state=reloaded
+  sudo: true
+
 
 - name: restart postfix 
   service: name=postfix state=restarted
   sudo: true
+
+- name: restart karaage3-celery 
+  service: name=karaage3-celery state=restarted
+  sudo: true
+

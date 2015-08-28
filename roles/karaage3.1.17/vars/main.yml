@@ -1,3 +1,5 @@
 ---
  apache_user: "{% if ansible_os_family == 'RedHat'  %}apache{% else %}www-data{% endif %}"
+ apache_dir: "{% if ansible_os_family == 'RedHat'  %}httpd{% else %}apache2{% endif %}"
+ apache_service: "{% if ansible_os_family == 'RedHat'  %}httpd{% else %}apache2{% endif %}"
  karaageSecretKey: "imkaraage"

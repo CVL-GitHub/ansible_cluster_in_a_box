@@ -1,3 +1,5 @@
 ---
- apache_user: "{% if ansible_os_family == 'RedHat'  %}apache{% else %}www-data{% endif %}"
  karaageSecretKey: "imkaraage"
+ ldapCARootCertDest: "/etc/{{ ldapDir }}/ssl/MeRC_HPC_CA_Root.cert.pem"
+ ldapCARootCertSrc: "MeRC_HPC_CA_Root.cert.pem"
+
